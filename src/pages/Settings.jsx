@@ -27,9 +27,9 @@ export default function Settings() {
     }}>
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-start mb-8">
-          <Link to="/dashboard" className="glass rounded-xl px-3 py-2 flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 transition-colors">
+          <Link to="/case1" className="glass rounded-xl px-3 py-2 flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800 transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            <span>Dashboard</span>
+            <span>Case1</span>
           </Link>
         </div>
         <div className="text-center mb-12">

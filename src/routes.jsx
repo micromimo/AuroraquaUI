@@ -1,8 +1,10 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import Init from './pages/Init'
 import Dashboard from './pages/Dashboard'
 import Settings from './pages/Settings'
 import About from './pages/About'
+import Case2 from './pages/Case2'
 
 function AnimatedRoutes() {
   const location = useLocation()
@@ -18,10 +20,13 @@ function AnimatedRoutes() {
         style={{ overflow: 'hidden' }}
       >
         <Routes location={location}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Init />} />
+          <Route path="/init" element={<Init />} />
+          <Route path="/case1" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Navigate to="/case1" replace />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/about" element={<About />} />
+          <Route path="/case2" element={<Case2 />} />
         </Routes>
       </motion.div>
     </AnimatePresence>
