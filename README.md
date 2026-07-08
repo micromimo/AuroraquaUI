@@ -56,6 +56,55 @@ init page(/init):
 /settings:
 <img width="2774" height="1740" alt="settings-page" src="https://github.com/user-attachments/assets/d7875aa0-9aba-4e9a-851a-a034c2c6bfc7" />
 
+## 📖 Directory Structure · 目錄結構
+src/
+├── components/              # 组件目录
+│   ├── case2/              # Case2 专用组件
+│   │   ├── BoundingBox.jsx
+│   │   ├── ControlPanel.jsx
+│   │   ├── ImagePreview.jsx
+│   │   └── ...
+│   ├── case3/              # Case3 专用组件
+│   │   ├── social/         # 社交媒体子组件
+│   │   │   ├── SocialHeader.jsx
+│   │   │   ├── SocialSidebar.jsx
+│   │   │   ├── SocialPost.jsx
+│   │   │   └── SocialRightPanel.jsx
+│   │   └── ...
+│   ├── common/             # 通用组件
+│   │   ├── ConnectionStatus.jsx
+│   │   ├── ControlButton.jsx
+│   │   ├── InfoItem.jsx
+│   │   ├── MermaidRenderer.jsx
+│   │   ├── Section.jsx
+│   │   ├── SettingRow.jsx
+│   │   ├── StatPill.jsx
+│   │   ├── Toggle.jsx
+│   │   └── UserAvatar.jsx
+│   └── core/               # 核心组件
+│       ├── Sidebar.jsx
+│       ├── Header.jsx
+│       └── Layout.jsx
+├── hooks/                  # 自定义 Hooks
+├── pages/                  # 页面组件
+│   ├── Case1.jsx           # Case1 主布局组件
+│   ├── Case2.jsx           # Case2 主布局组件
+│   ├── Case3.jsx           # Case3 主布局组件
+│   └── case3/              # Case3 子页面
+│       ├── DashboardSubpage.jsx
+│       ├── ManagementSubpage.jsx
+│       ├── ChatSubpage.jsx
+│       ├── MarkdownSubpage.jsx
+│       ├── MindmapSubpage.jsx
+│       ├── VideoSubpage.jsx
+│       ├── SocialSubpage.jsx
+│       ├── ForumSubpage.jsx
+│       └── MusicSubpage.jsx
+├── App.jsx
+├── routes.jsx              # 路由配置
+├── setupTests.js           # 测试配置
+└── index.css               # 全局样式
+
 ## 🎨 Visual & Design Features
 * **Dynamic Navbar**: Graceful animated Navbar that can show/hide Sidebar.
 * **Aurora Background**: Employs a subtle, soft pink-to-purple gradient, crafting a modern yet cozy visual tone.
