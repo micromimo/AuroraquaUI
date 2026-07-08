@@ -19,7 +19,7 @@ Release中提供了MacOS和Windows版本的Tauri App。<br />
 # Components Demos(in /case3):
 Dashboard
 <img width="2776" height="1740" alt="Dashboard1" src="https://github.com/user-attachments/assets/3d2c0432-a13a-4efe-a695-4d6b0cf491f8" />
-Social Media(imitate BlueSky{https://github.com/bluesky-social/social-app} Layout)
+Social Media(imitate BlueSky(https://github.com/bluesky-social/social-app) Layout)
 <img width="2776" height="1740" alt="SocialDiscoverPage" src="https://github.com/user-attachments/assets/22a96168-cfc6-4aee-bb29-6885c3f67a99" />
 <img width="2776" height="1740" alt="SocialSettings" src="https://github.com/user-attachments/assets/ca390314-949f-4b87-8dbe-5d8116962851" />
 Navbar & Animation show:
