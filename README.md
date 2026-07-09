@@ -21,6 +21,8 @@ Release中提供了MacOS和Windows版本的Tauri App。<br />
 # Components Demos(in /case3):
 Dashboard
 <img width="2776" height="1740" alt="Dashboard1" src="https://github.com/user-attachments/assets/3d2c0432-a13a-4efe-a695-4d6b0cf491f8" />
+MeTube(Video Streaming Website, imitate Youtube Layout)
+<img width="2776" height="1740" alt="Video" src="https://github.com/user-attachments/assets/12ef7b4e-59aa-46da-acd7-171ba54b2fb4" />
 Social Media(imitate BlueSky(https://github.com/bluesky-social/social-app) Layout)
 <img width="2776" height="1740" alt="SocialDiscoverPage" src="https://github.com/user-attachments/assets/22a96168-cfc6-4aee-bb29-6885c3f67a99" />
 <img width="2776" height="1740" alt="SocialSettings" src="https://github.com/user-attachments/assets/ca390314-949f-4b87-8dbe-5d8116962851" />
@@ -28,8 +30,6 @@ Navbar & Animation show:
 
 https://github.com/user-attachments/assets/a6931449-a15d-4ecd-b50c-ac254e219207
 
-MeTube(Video Streaming Website, imitate Youtube Layout)
-<img width="2776" height="1740" alt="Video" src="https://github.com/user-attachments/assets/12ef7b4e-59aa-46da-acd7-171ba54b2fb4" />
 Markdown Viewer & Editor
 <img width="2776" height="1740" alt="Markdown" src="https://github.com/user-attachments/assets/6bbe7102-fa60-49c4-b15c-faaac659450a" />
 Management Page
