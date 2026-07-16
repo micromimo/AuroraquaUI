@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Send, User } from 'lucide-react';
 
 const initialMessages = [
@@ -71,7 +72,12 @@ function LiveChat() {
   };
 
   return (
-    <div className={`fixed bottom-6 right-6 z-40 transition-all duration-300 ${isExpanded ? 'w-80' : 'w-48'}`}>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut', delay: 0.4 }}
+      className={`fixed bottom-6 right-6 z-40 transition-all duration-300 ${isExpanded ? 'w-80' : 'w-48'}`}
+    >
       <div className="liquid-glass rounded-2xl overflow-hidden shadow-xl">
         <div 
           className="flex items-center justify-between p-3 cursor-pointer hover:bg-white/10 transition-colors"
@@ -130,7 +136,7 @@ function LiveChat() {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

@@ -1,17 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Send, MessageCircle } from 'lucide-react';
 import LiveChat from '../LiveChat';
+import ParticleEffect from '../../ui/ParticleEffect';
+import AnimatedNumber from '../../ui/AnimatedNumber';
+import { ToastContainer, useToast } from '../../ui/ToastContainer';
+import PillTabBar from '../../ui/PillTabBar';
 import { defaultComments, uploaderInfo, videoInfo, favoriteFolders, relatedVideos } from '../../../data/case3/video';
+import { FadeInCard, StaggerItem } from '../../ui/animations';
 
-export default function VideoSubpage() {
+function VideoSubpageInner() {
+  const { addToast } = useToast();
   const [likes, setLikes] = useState(1250);
   const [isLiked, setIsLiked] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriberCount, setSubscriberCount] = useState(uploaderInfo.subscribers);
-  const [showSubscribeToast, setShowSubscribeToast] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
   const [sortBy, setSortBy] = useState('hot');
   const [showFavoriteMenu, setShowFavoriteMenu] = useState(false);
@@ -19,6 +24,12 @@ export default function VideoSubpage() {
   const [favoriteFolder, setFavoriteFolder] = useState(null);
   const [replyingTo, setReplyingTo] = useState(null);
   const [comments, setComments] = useState(defaultComments);
+  const [likeParticles, setLikeParticles] = useState({ active: false, x: 0, y: 0 });
+  const [subscribeParticles, setSubscribeParticles] = useState({ active: false, x: 0, y: 0 });
+  const [videoLoadFailed, setVideoLoadFailed] = useState(false);
+  const likeButtonRef = useRef(null);
+  const subscribeButtonRef = useRef(null);
+  const iframeRef = useRef(null);
 
   useEffect(() => {
     if ('scrollRestoration' in history) {
@@ -66,6 +77,33 @@ export default function VideoSubpage() {
     };
   }, []);
 
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+
+    let loaded = false;
+    let timeoutId;
+
+    const handleLoad = () => {
+      loaded = true;
+      clearTimeout(timeoutId);
+    };
+
+    iframe.addEventListener('load', handleLoad);
+
+    timeoutId = setTimeout(() => {
+      if (!loaded) {
+        setVideoLoadFailed(true);
+        addToast('影片加载失败，请确保您不在中国｜朝鲜｜伊朗｜土库曼斯坦｜厄立特里亚', 'error', 0);
+      }
+    }, 3000);
+
+    return () => {
+      iframe.removeEventListener('load', handleLoad);
+      clearTimeout(timeoutId);
+    };
+  }, [addToast]);
+
   const uploader = {
     ...uploaderInfo,
     subscribers: subscriberCount,
@@ -84,13 +122,22 @@ export default function VideoSubpage() {
     }));
   };
 
-  const handleLike = () => {
+  const handleLike = (e) => {
     if (isLiked) {
       setLikes(likes - 1);
       setIsLiked(false);
     } else {
       setLikes(likes + 1);
       setIsLiked(true);
+      
+      if (e && likeButtonRef.current) {
+        const rect = likeButtonRef.current.getBoundingClientRect();
+        setLikeParticles({
+          active: true,
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        });
+      }
     }
   };
 
@@ -110,10 +157,16 @@ export default function VideoSubpage() {
     if (!isSubscribed) {
       setIsSubscribed(true);
       setSubscriberCount(prev => prev + 1);
-      setShowSubscribeToast(true);
-      setTimeout(() => {
-        setShowSubscribeToast(false);
-      }, 3000);
+      addToast('订阅成功！', 'check', 3000);
+      
+      if (subscribeButtonRef.current) {
+        const rect = subscribeButtonRef.current.getBoundingClientRect();
+        setSubscribeParticles({
+          active: true,
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        });
+      }
     } else {
       setIsSubscribed(false);
       setSubscriberCount(prev => prev - 1);
@@ -146,30 +199,32 @@ export default function VideoSubpage() {
   };
 
   return (
-    <div className="h-full flex flex-col gap-4">
+      <div className="h-full flex flex-col gap-4 relative">
       <div className="flex-1 grid grid-cols-3 gap-4 min-h-0">
-        <div className="col-span-2 flex flex-col gap-4">
-          <div className="liquid-glass rounded-2xl p-2 overflow-hidden">
-            <iframe
-              src="https://www.youtube-nocookie.com/embed/mkP5Myd-YZU"
-              title="めめしぃ / すりぃ feat.可不"
-              className="w-full h-full aspect-video rounded-xl"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              referrerpolicy="strict-origin-when-cross-origin"
-            />
-          </div>
+        <div className="col-span-2 flex flex-col gap-4 relative">
+          <FadeInCard className="liquid-glass rounded-2xl p-2 overflow-hidden relative" delay={0.1}>
+            {videoLoadFailed ? (
+              <div className="w-full h-full aspect-video rounded-xl bg-white/10 flex items-center justify-center">
+                <p className="text-sm text-muted">⚠️影片加载失败，请确保您不在中国｜朝鲜｜伊朗｜土库曼斯坦｜厄立特里亚</p>
+              </div>
+            ) : (
+              <iframe
+                ref={iframeRef}
+                src="https://www.youtube-nocookie.com/embed/mkP5Myd-YZU"
+                title="めめしぃ / すりぃ feat.可不"
+                className="w-full h-full aspect-video rounded-xl"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            )}
+          </FadeInCard>
 
-          <motion.div
-            className="liquid-glass rounded-2xl p-4 space-y-4"
-            initial={{ height: 'auto' }}
-            animate={{ height: 'auto' }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-          >
+          <FadeInCard className="liquid-glass rounded-2xl p-4 space-y-4" delay={0.2}>
             <div>
               <h3 className="font-bold text-heading mb-2">{videoInfo.title}</h3>
               <div className="flex items-center gap-4 text-xs text-muted">
-                <span>{videoInfo.views} 观看</span>
+                <AnimatedNumber value={videoInfo.views}>{videoInfo.views}</AnimatedNumber> 观看
                 <span>{videoInfo.duration}</span>
                 <span>上传于 {videoInfo.uploadDate}</span>
               </div>
@@ -177,7 +232,7 @@ export default function VideoSubpage() {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-purple-400 flex items-center justify-center text-sm text-white font-semibold">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-purple-400 flex items-center justify-center text-sm text-white font-semibold avatar-border">
                   {uploader.avatar}
                 </div>
                 <div>
@@ -189,10 +244,13 @@ export default function VideoSubpage() {
                       </svg>
                     )}
                   </div>
-                  <div className="text-xs text-muted">{formatSubscribers(uploader.subscribers)} 订阅者</div>
+                  <AnimatedNumber value={subscriberCount}>
+                    <span className="text-xs text-muted">{formatSubscribers(subscriberCount)} 订阅者</span>
+                  </AnimatedNumber>
                 </div>
               </div>
               <button
+                ref={subscribeButtonRef}
                 onClick={handleSubscribe}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
                   isSubscribed
@@ -214,13 +272,14 @@ export default function VideoSubpage() {
 
             <div className="flex gap-3">
               <button 
+                ref={likeButtonRef}
                 onClick={handleLike}
-                className={`glass-button text-sm flex items-center gap-2 transition-all duration-300 ${isLiked ? 'text-pink-600 bg-pink-500/10' : ''}`}
+                className={`glass-button text-sm flex items-center gap-2 transition-all duration-300 ${isLiked ? 'text-red-600 bg-red-500/10' : ''}`}
               >
-                <svg className={`w-5 h-5 transition-all duration-300 ${isLiked ? 'fill-current scale-110' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className={`w-5 h-5 transition-all duration-300 ${isLiked ? 'fill-red-500 scale-110' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                 </svg>
-                <span className={`transition-all duration-300 ${isLiked ? 'font-bold scale-105' : ''}`}>{likes.toLocaleString()}</span>
+                <AnimatedNumber value={likes}>{likes.toLocaleString()}</AnimatedNumber>
               </button>
               <button className="glass-button text-sm flex items-center justify-center">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -238,9 +297,9 @@ export default function VideoSubpage() {
               </button>
               <button 
                 onClick={toggleFavoriteMenu}
-                className={`glass-button text-sm flex items-center justify-center transition-all duration-300 ${isFavorited ? 'text-pink-600 bg-pink-500/10' : ''}`}
+                className={`glass-button text-sm flex items-center justify-center transition-all duration-300 ${isFavorited ? 'text-yellow-600 bg-yellow-500/10' : ''}`}
               >
-                <Star className={`w-5 h-5 transition-all duration-300 ${isFavorited ? 'fill-current scale-110' : ''}`} />
+                <Star className={`w-5 h-5 transition-all duration-300 ${isFavorited ? 'fill-yellow-500 scale-110' : ''}`} />
               </button>
             </div>
 
@@ -273,37 +332,23 @@ export default function VideoSubpage() {
                 </button>
               )}
             </div>
-          </motion.div>
+          </FadeInCard>
 
-          <div className="flex-1 liquid-glass rounded-2xl p-4 overflow-auto">
+          <FadeInCard className="flex-1 liquid-glass rounded-2xl p-4 overflow-auto" delay={0.3}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-heading">评论 ({comments.length})</h3>
-              <div className="flex bg-white/30 rounded-lg p-1">
-                <button
-                  onClick={() => setSortBy('hot')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-300 ${
-                    sortBy === 'hot'
-                      ? 'bg-white text-pink-600 shadow-sm'
-                      : 'text-muted hover:text-body'
-                }`}
-              >
-                按热度排序
-              </button>
-              <button
-                onClick={() => setSortBy('time')}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-300 ${
-                  sortBy === 'time'
-                    ? 'bg-white text-pink-600 shadow-sm'
-                    : 'text-muted hover:text-body'
-                  }`}
-                >
-                  按时间排序
-                </button>
-              </div>
+              <h3 className="font-bold text-heading">评论 (<AnimatedNumber value={comments.length}>{comments.length}</AnimatedNumber>)</h3>
+              <PillTabBar
+                tabs={[
+                  { id: 'hot', label: '按热度排序' },
+                  { id: 'time', label: '按时间排序' }
+                ]}
+                activeTab={sortBy}
+                onChange={setSortBy}
+              />
             </div>
             <div className="mb-4">
               <form onSubmit={handleCommentSubmit} className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-xs text-white shrink-0">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-xs text-white shrink-0 avatar-border">
                   M
                 </div>
                 <input
@@ -327,7 +372,7 @@ export default function VideoSubpage() {
                   transition={{ duration: 0.3 }}
                   className="flex gap-3"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-400 flex items-center justify-center text-xs text-white">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-purple-400 flex items-center justify-center text-xs text-white avatar-border">
                     {comment.user[0]}
                   </div>
                   <div className="flex-1">
@@ -348,7 +393,15 @@ export default function VideoSubpage() {
                         <svg className={`w-3.5 h-3.5 transition-all duration-300 ${comment.isLiked ? 'fill-current scale-110' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                         </svg>
-                        <span className={`transition-all duration-300 ${comment.isLiked ? 'font-bold scale-105' : ''}`}>{comment.likes}</span>
+                        <motion.span 
+                          key={comment.likes}
+                          initial={{ scale: 1 }}
+                          animate={{ scale: [1, 1.3, 1] }}
+                          transition={{ duration: 0.3 }}
+                          className={`transition-all duration-300 ${comment.isLiked ? 'font-bold' : ''}`}
+                        >
+                          <AnimatedNumber value={comment.likes}>{comment.likes}</AnimatedNumber>
+                        </motion.span>
                       </button>
                       <button 
                         onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
@@ -387,21 +440,32 @@ export default function VideoSubpage() {
                 </motion.div>
               ))}
             </div>
-          </div>
+          </FadeInCard>
+          <ToastContainer />
         </div>
 
         <div className="flex flex-col gap-3 overflow-auto">
-          {relatedVideos.map((video) => (
-            <div key={video.id} className="flex gap-3 p-2 rounded-xl hover:bg-white/20 transition-colors cursor-pointer">
-              <div className="w-28 h-16 rounded-lg bg-gradient-to-r from-pink-400/80 to-purple-400/80 flex items-center justify-center text-2xl shrink-0">
+          {relatedVideos.map((video, index) => (
+            <StaggerItem
+              key={video.id}
+              index={index}
+              direction="up"
+              whileHover={{ x: 4 }}
+              className="flex gap-3 p-2 rounded-xl hover:bg-white/20 transition-colors cursor-pointer"
+            >
+              <motion.div 
+                whileHover={{ scale: 1.08 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                className="w-28 h-16 rounded-lg bg-gradient-to-r from-pink-400/80 to-purple-400/80 flex items-center justify-center text-2xl shrink-0 avatar-border overflow-hidden"
+              >
                 {video.thumbnail}
-              </div>
+              </motion.div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-sm font-medium text-body truncate">{video.title}</h4>
-                <div className="text-xs text-muted mt-1">{video.views} 观看</div>
+                <div className="text-xs text-muted mt-1"><AnimatedNumber value={video.views}>{video.views}</AnimatedNumber> 观看</div>
                 <div className="text-xs text-muted">{video.duration}</div>
               </div>
-            </div>
+              </StaggerItem>
           ))}
         </div>
       </div>
@@ -409,11 +473,11 @@ export default function VideoSubpage() {
       <AnimatePresence>
         {showShareModal && (
           <motion.div 
-            className="fixed inset-0 modal-overlay z-50 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            initial={{ backgroundColor: 'rgba(0, 0, 0, 0)', backdropFilter: 'blur(0px)' }}
+            animate={{ backgroundColor: 'rgba(0, 0, 0, 0.25)', backdropFilter: 'blur(12px)' }}
+            exit={{ backgroundColor: 'rgba(0, 0, 0, 0)', backdropFilter: 'blur(0px)' }}
+            transition={{ duration: 0.3 }}
           >
             <motion.div 
               className="modal-panel p-6 w-full max-w-sm"
@@ -443,11 +507,11 @@ export default function VideoSubpage() {
         )}
         {showFavoriteMenu && (
           <motion.div 
-            className="fixed inset-0 modal-overlay z-50 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            initial={{ backgroundColor: 'rgba(0, 0, 0, 0)', backdropFilter: 'blur(0px)' }}
+            animate={{ backgroundColor: 'rgba(0, 0, 0, 0.25)', backdropFilter: 'blur(12px)' }}
+            exit={{ backgroundColor: 'rgba(0, 0, 0, 0)', backdropFilter: 'blur(0px)' }}
+            transition={{ duration: 0.3 }}
           >
             <motion.div 
               className="modal-panel p-6 w-full max-w-sm"
@@ -478,27 +542,26 @@ export default function VideoSubpage() {
             </motion.div>
           </motion.div>
         )}
-        {showSubscribeToast && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50"
-          >
-            <div className="liquid-glass rounded-full px-6 py-3 shadow-xl flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center">
-                <svg className="w-4 h-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
-              <span className="text-sm text-heading font-medium">订阅成功！</span>
-            </div>
-          </motion.div>
-        )}
       </AnimatePresence>
+
+      <ParticleEffect 
+        active={likeParticles.active} 
+        x={likeParticles.x} 
+        y={likeParticles.y}
+        onComplete={() => setLikeParticles({ active: false, x: 0, y: 0 })}
+      />
+      <ParticleEffect 
+        active={subscribeParticles.active} 
+        x={subscribeParticles.x} 
+        y={subscribeParticles.y}
+        onComplete={() => setSubscribeParticles({ active: false, x: 0, y: 0 })}
+      />
 
       <LiveChat />
     </div>
   );
+}
+
+export default function VideoSubpage() {
+  return <VideoSubpageInner />;
 }

@@ -1,17 +1,18 @@
 import { Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 import NavBar from './NavBar';
 
 const sidebarItems = [
   { id: 'dashboard', label: 'Admin Dashboard', icon: 'LayoutDashboard', path: '/case3/dashboard' },
   { id: 'video', label: 'MeTube', icon: 'PlayCircle', path: '/case3/video' },
   { id: 'social', label: 'Prysm™ Social ', icon: 'Users', path: '/case3/social/main' },
-  { id: 'management', label: 'Management', icon: 'Database', path: '/case3/management' },
-  { id: 'markdown', label: 'Markdown', icon: 'FileText', path: '/case3/markdown' },
-  { id: 'mindmap', label: 'Mermaid Flowchart&Diagrams', icon: 'GitBranch', path: '/case3/mindmap' },
   { id: 'chat', label: 'Chat', icon: 'MessageSquare', path: '/case3/chat' },
-  { id: 'forum', label: 'Forum', icon: 'MessageCircle', path: '/case3/forum' },
   { id: 'music', label: 'Music', icon: 'Music', path: '/case3/music' },
+  { id: 'mindmap', label: 'Mermaid Flowchart&Diagrams', icon: 'GitBranch', path: '/case3/mindmap' },
+  { id: 'markdown', label: 'Markdown', icon: 'FileText', path: '/case3/markdown' },
+  { id: 'management', label: 'Management', icon: 'Database', path: '/case3/management' },
+  { id: 'forum', label: 'Forum', icon: 'MessageCircle', path: '/case3/forum' },
 ];
 
 const iconMap = {
@@ -93,8 +94,15 @@ export default function Case3Sidebar({
     <div className="fixed left-0 top-[22px] bottom-4 z-50">
       <NavBar onToggle={onToggle} style={{ marginLeft: '8px', marginRight: '8px', top: '0' }} />
       
-      <aside className={`absolute left-6 top-0 bottom-0 w-[280px] transition-all duration-300 ${sidebarOpen ? 'opacity-100 pointer-events-auto translate-x-0' : 'opacity-0 pointer-events-none -translate-x-full'}`}>
-        <div className="h-full liquid-glass rounded-2xl p-4 flex flex-col">
+      <aside className={`absolute left-6 top-0 bottom-0 w-[280px] transition-all duration-500 ease-out ${sidebarOpen ? 'opacity-100 pointer-events-auto translate-x-0' : 'opacity-0 pointer-events-none -translate-x-full'}`}>
+        <motion.div 
+          className="h-full liquid-glass rounded-2xl p-4 flex flex-col"
+          initial={false}
+          animate={{ 
+            scale: sidebarOpen ? 1 : 0.95,
+          }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+        >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden avatar-border">
@@ -115,31 +123,41 @@ export default function Case3Sidebar({
         </div>
 
         <nav className="flex-1 space-y-1">
-          {sidebarItems.map((item) => {
+          {sidebarItems.map((item, index) => {
             const Icon = iconMap[item.icon];
             const active = isActive(item.id);
             return (
-              <Link
+              <motion.div
                 key={item.id}
-                to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden ${
-                  active 
-                    ? 'text-pink-700' 
-                    : 'hover:bg-white/20'
-                }`}
-                style={active ? {
-                  background: 'linear-gradient(135deg, rgba(255, 211, 219, 0.8), rgba(255, 211, 219, 0.4))',
-                  boxShadow: '0 0 20px rgba(244, 114, 182, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6)'
-                } : { color: 'var(--text-body)' }}
+                initial={sidebarOpen ? { opacity: 0, x: -20 } : false}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ 
+                  duration: 0.3, 
+                  delay: sidebarOpen ? index * 0.05 : 0,
+                  ease: 'easeOut'
+                }}
               >
-                {active && (
-                  <div className="absolute inset-0 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  </div>
-                )}
-                <Icon className={`w-5 h-5 relative z-10 ${active ? 'drop-shadow-[0_0_8px_rgba(244,114,182,0.6)]' : ''}`} />
-                <span className="font-medium text-sm relative z-10">{item.label}</span>
-              </Link>
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden ${
+                    active 
+                      ? 'text-pink-700' 
+                      : 'hover:bg-white/20'
+                  }`}
+                  style={active ? {
+                    background: 'linear-gradient(135deg, rgba(255, 211, 219, 0.8), rgba(255, 211, 219, 0.4))',
+                    boxShadow: '0 0 20px rgba(244, 114, 182, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.6)'
+                  } : { color: 'var(--text-body)' }}
+                >
+                  {active && (
+                    <div className="absolute inset-0 overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                    </div>
+                  )}
+                  <Icon className={`w-5 h-5 relative z-10 ${active ? 'drop-shadow-[0_0_8px_rgba(244,114,182,0.6)]' : ''}`} />
+                  <span className="font-medium text-sm relative z-10">{item.label}</span>
+                </Link>
+              </motion.div>
             );
           })}
         </nav>
@@ -150,7 +168,7 @@ export default function Case3Sidebar({
             <span>9 个展示页面</span>
           </div>
         </div>
-        </div>
+        </motion.div>
       </aside>
     </div>
   );

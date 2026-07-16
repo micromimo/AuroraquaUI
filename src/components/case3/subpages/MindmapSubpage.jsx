@@ -41,7 +41,7 @@ export default function MindmapSubpage() {
 
     const initAndRender = async () => {
       try {
-        await mermaid.initialize({
+        mermaid.initialize({
           startOnLoad: false,
           theme: 'base',
           themeVariables: {
@@ -86,20 +86,19 @@ export default function MindmapSubpage() {
           }
 
           try {
-            const result = await mermaid.render('mindmap-svg', mindmapCode);
+            const uniqueId = `mindmap-${Date.now()}`;
+            const result = await mermaid.render(uniqueId, mindmapCode);
             
-            if (result && (result.svg || result)) {
-              const svgContent = typeof result === 'string' ? result : result.svg;
-              if (svgContent && svgContent.trim()) {
-                mindmapRef.current.innerHTML = svgContent;
-                setIsRendered(true);
-              } else {
-                console.warn('Mermaid returned empty SVG, retrying...');
-                await new Promise(resolve => setTimeout(resolve, 200));
-                renderMindmap();
-              }
+            if (result && result.svg) {
+              mindmapRef.current.innerHTML = result.svg;
+              setIsRendered(true);
+            } else if (result && typeof result === 'string') {
+              mindmapRef.current.innerHTML = result;
+              setIsRendered(true);
             } else {
-              console.warn('Mermaid render result is undefined');
+              console.warn('Mermaid returned empty SVG, retrying...');
+              await new Promise(resolve => setTimeout(resolve, 200));
+              renderMindmap();
             }
           } catch (error) {
             console.error('Failed to render mindmap:', error);
@@ -292,7 +291,7 @@ export default function MindmapSubpage() {
         </div>
       </div>
       
-      <div 
+      <motion.div 
         className="flex-1 liquid-glass rounded-2xl overflow-hidden relative"
         onWheel={handleWheel}
         onMouseDown={handleMouseDown}
@@ -300,6 +299,9 @@ export default function MindmapSubpage() {
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <div 
           className="relative w-full h-full flex items-center justify-center"
@@ -343,7 +345,7 @@ export default function MindmapSubpage() {
             </svg>
           </button>
         </div>
-      </div>
+      </motion.div>
 
       <AnimatePresence>
         {showEditModal && (

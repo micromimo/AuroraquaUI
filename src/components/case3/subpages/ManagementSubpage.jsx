@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { managementTabs, productsData, usersData, ordersData, analyticsData, defaultFormData, tableHeaders } from '../../../data/case3/management';
+import { StaggerItem } from '../../ui/animations';
 
 export default function ManagementSubpage() {
   const [activeTab, setActiveTab] = useState('orders');
@@ -40,8 +41,13 @@ export default function ManagementSubpage() {
       case 'products':
         return (
           <div className="flex-1 overflow-auto space-y-2">
-            {productsState.map((item) => (
-              <div key={item.id} className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-white/20 hover:bg-white/30 transition-colors">
+            {productsState.map((item, index) => (
+              <StaggerItem
+                key={item.id}
+                index={index}
+                direction="left"
+                className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-white/20 hover:bg-white/30 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${item.status === 'active' ? 'bg-green-500' : 'bg-gray-400'}`} />
                   <span className="text-sm font-medium text-heading">{item.name}</span>
@@ -56,15 +62,20 @@ export default function ManagementSubpage() {
                     删除
                   </button>
                 </div>
-              </div>
+              </StaggerItem>
             ))}
           </div>
         );
       case 'users':
         return (
           <div className="flex-1 overflow-auto space-y-2">
-            {usersState.map((item) => (
-              <div key={item.id} className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-white/20 hover:bg-white/30 transition-colors">
+            {usersState.map((item, index) => (
+              <StaggerItem
+                key={item.id}
+                index={index}
+                direction="left"
+                className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-white/20 hover:bg-white/30 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${item.status === 'active' ? 'bg-green-500' : 'bg-gray-400'}`} />
                   <span className="text-sm font-medium text-heading">{item.name}</span>
@@ -79,15 +90,20 @@ export default function ManagementSubpage() {
                     删除
                   </button>
                 </div>
-              </div>
+              </StaggerItem>
             ))}
           </div>
         );
       case 'orders':
         return (
           <div className="flex-1 overflow-auto space-y-2">
-            {ordersState.map((item) => (
-              <div key={item.id} className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-white/20 hover:bg-white/30 transition-colors">
+            {ordersState.map((item, index) => (
+              <StaggerItem
+                key={item.id}
+                index={index}
+                direction="left"
+                className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-white/20 hover:bg-white/30 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <span className={`text-xs px-2 py-0.5 rounded-full ${
                     item.status === 'completed' ? 'bg-green-100 text-green-600' :
@@ -105,7 +121,7 @@ export default function ManagementSubpage() {
                     查看
                   </button>
                 </div>
-              </div>
+              </StaggerItem>
             ))}
           </div>
         );

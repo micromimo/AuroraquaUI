@@ -13,7 +13,7 @@ const menuItems = [
   { id: 'settings', label: '設定', icon: Settings, path: '/case3/social/settings' },
 ];
 
-function SocialSidebar({ activeItem, onItemClick }) {
+function SocialSidebar({ activeItem, onItemClick, onNewPost }) {
   const navigate = useNavigate();
 
   const scrollToTop = () => {
@@ -31,12 +31,12 @@ function SocialSidebar({ activeItem, onItemClick }) {
   };
 
   return (
-    <aside className="w-full h-full min-h-0 flex flex-col overflow-y-auto p-2">
-      <div className="liquid-glass rounded-2xl p-4 flex flex-col">
+    <aside className="w-full h-full min-h-0 flex flex-col p-2">
+      <div className="liquid-glass rounded-2xl p-4 flex flex-col flex-1 min-h-0">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-xl overflow-hidden avatar-border">
             <img
-              src="https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:vg4lorilmjn5ztscb5fh7y2n/bafkreiek3mwh7kpqivzsviwnbnw6ewzqgsva4767rx2dbups24s3bf523a"
+              src="/avater.jpg"
               alt="User Avatar"
               className="w-full h-full object-cover"
             />
@@ -77,7 +77,7 @@ function SocialSidebar({ activeItem, onItemClick }) {
           })}
         </nav>
 
-        <button className="mt-4 w-full glass-button flex items-center justify-center gap-2 text-blue-500 hover:text-blue-600">
+        <button onClick={onNewPost} className="mt-4 w-full glass-button flex items-center justify-center gap-2 text-blue-500 hover:text-blue-600">
           <Plus className="w-5 h-5" />
           <span className="font-medium">新贴文</span>
         </button>

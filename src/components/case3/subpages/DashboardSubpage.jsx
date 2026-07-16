@@ -1,14 +1,66 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { dashboardStats, recentActivities, pieData, tableData, chartData, defaultTodos } from '../../../data/case3/dashboard';
+import { recentActivities, pieData, tableData, chartData, defaultTodos } from '../../../data/case3/dashboard';
+import AnimatedNumber from '../../ui/AnimatedNumber';
+import { TiltCard } from '../../ui/TiltCard';
+import { FadeInCard } from '../../ui/animations';
+
+const initialStats = [
+  { label: '总访问量', value: 128456, format: (v) => v.toLocaleString(), change: '+12.5%' },
+  { label: '活跃用户', value: 8234, format: (v) => v.toLocaleString(), change: '+8.3%' },
+  { label: '转化率', value: 6.4, format: (v) => v.toFixed(1) + '%', change: '-1.3%' },
+  { label: '平均时长', value: 272, format: (v) => {
+    const m = Math.floor(v / 60);
+    const s = Math.floor(v % 60);
+    return `${m}m ${s.toString().padStart(2, '0')}s`;
+  }, change: '+15.2%' },
+];
 
 export default function DashboardSubpage() {
+  const [stats, setStats] = useState(initialStats);
   const [todos, setTodos] = useState(() => {
     const saved = localStorage.getItem('case3_todos');
     return saved ? JSON.parse(saved) : defaultTodos;
   });
 
   const [selectedPieIndex, setSelectedPieIndex] = useState(null);
+  const [chartAnimationKey, setChartAnimationKey] = useState(() => {
+    try {
+      const hasPlayed = sessionStorage.getItem('dashboard_chart_animation_played');
+      if (hasPlayed) {
+        return 'static';
+      }
+      sessionStorage.setItem('dashboard_chart_animation_played', 'true');
+      return Date.now();
+    } catch (e) {
+      // sessionStorage 不可用时回退
+      return Date.now();
+    }
+  });
+
+  useEffect(() => {
+    if (chartAnimationKey !== 'static') {
+      sessionStorage.setItem('dashboard_chart_animation_played', 'true');
+    }
+  }, [chartAnimationKey]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStats(prev => prev.map(stat => {
+        let delta;
+        if (stat.label === '转化率') {
+          delta = (Math.random() - 0.5) * 0.4;
+        } else if (stat.label === '平均时长') {
+          delta = (Math.random() - 0.5) * 20;
+        } else {
+          delta = 2;
+        }
+        const newValue = Math.max(0, stat.value + delta);
+        return { ...stat, value: newValue };
+      }));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingTodo, setEditingTodo] = useState(null);
@@ -145,85 +197,118 @@ export default function DashboardSubpage() {
     }, 200));
   };
 
-  const ChartLine = ({ data, keyName, color, gradientId }) => (
-    <>
-      <path
-        d={createAreaPath(data, keyName, maxChartValue)}
-        fill={`url(#${gradientId})`}
-        opacity="0.3"
-      />
-      <path
-        d={createSmoothPath(data, keyName, maxChartValue)}
-        fill="none"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {data.map((d, i) => {
-        const x = 40 + (i / 9) * 340;
-        const y = 200 - (d[keyName] / maxChartValue) * 160;
-        return (
-          <g key={i}>
-            <circle
-              cx={x}
-              cy={y}
-              r="4"
-              fill="white"
-              stroke={color}
-              strokeWidth="2"
-              className="opacity-0 hover:opacity-100 cursor-pointer transition-opacity"
-              onMouseEnter={(e) => handleMouseEnter(d, i, e)}
-              onMouseLeave={handleMouseLeave}
-            />
-            <circle
-              cx={x}
-              cy={y}
-              r="2"
-              fill={color}
-              className="opacity-0 hover:opacity-100 cursor-pointer transition-opacity"
-              onMouseEnter={(e) => handleMouseEnter(d, i, e)}
-              onMouseLeave={handleMouseLeave}
-            />
-          </g>
-        );
-      })}
-    </>
-  );
+  const ChartLine = ({ data, keyName, color, gradientId, animationId }) => {
+    const linePath = createSmoothPath(data, keyName, maxChartValue);
+    
+    return (
+      <>
+        <motion.path
+          key={`area-${animationId}`}
+          d={createAreaPath(data, keyName, maxChartValue)}
+          fill={`url(#${gradientId})`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        />
+        <motion.path
+          key={`line-${animationId}`}
+          d={linePath}
+          fill="none"
+          stroke={color}
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1.5, ease: 'easeInOut', delay: 0.3 }}
+        />
+        {data.map((d, i) => {
+          const x = 40 + (i / 9) * 340;
+          const y = 200 - (d[keyName] / maxChartValue) * 160;
+          return (
+            <motion.g 
+              key={i}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ 
+                duration: 0.3, 
+                delay: 0.8 + i * 0.1,
+                ease: 'easeOut'
+              }}
+            >
+              <circle
+                cx={x}
+                cy={y}
+                r="4"
+                fill="white"
+                stroke={color}
+                strokeWidth="2"
+                className="opacity-0 hover:opacity-100 cursor-pointer transition-opacity"
+                onMouseEnter={(e) => handleMouseEnter(d, i, e)}
+                onMouseLeave={handleMouseLeave}
+              />
+              <circle
+                cx={x}
+                cy={y}
+                r="2"
+                fill={color}
+                className="opacity-0 hover:opacity-100 cursor-pointer transition-opacity"
+                onMouseEnter={(e) => handleMouseEnter(d, i, e)}
+                onMouseLeave={handleMouseLeave}
+              />
+            </motion.g>
+          );
+        })}
+      </>
+    );
+  };
 
   return (
     <div className="h-full flex flex-col gap-5">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {dashboardStats.map((stat) => (
-          <div key={stat.label} className="liquid-glass rounded-2xl p-5 hover:shadow-lg transition-shadow duration-300">
-            <div className="flex items-center justify-between mb-3">
-              <div className="text-xs text-muted font-medium">{stat.label}</div>
-              <div className={`w-2 h-2 rounded-full ${stat.change.startsWith('+') ? 'bg-green-500' : 'bg-red-500'}`} />
-            </div>
-            <div className="text-2xl font-bold text-heading mb-1">{stat.value}</div>
-            <div className={`text-xs flex items-center gap-1 ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-              <span>{stat.change.startsWith('+') ? '↑' : '↓'}</span>
-              <span>{stat.change}</span>
-            </div>
-          </div>
+        {stats.map((stat, index) => (
+          <TiltCard key={stat.label} tiltAmount={6} scaleAmount={1.01}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ 
+                duration: 0.5, 
+                delay: index * 0.1,
+                ease: [0.25, 0.46, 0.45, 0.94]
+              }}
+              className="liquid-glass rounded-2xl p-5 transition-shadow duration-500 cursor-default"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-xs text-muted font-medium">{stat.label}</div>
+                <div className={`w-2 h-2 rounded-full ${stat.change.startsWith('+') ? 'bg-[#84CC16] shadow-[0_0_8px_rgba(132,204,22,0.8)]' : 'bg-[#F48EBE] shadow-[0_0_8px_rgba(244,142,190,0.8)]'}`} />
+              </div>
+              <div className="text-2xl font-bold text-heading mb-1">
+                <AnimatedNumber value={stat.value}>{stat.format(stat.value)}</AnimatedNumber>
+              </div>
+              <div className={`text-xs flex items-center gap-1`} style={{ color: stat.change.startsWith('+') ? '#84CC16' : '#F48EBE' }}>
+                <span>{stat.change.startsWith('+') ? '↑' : '↓'}</span>
+                <span>{stat.change}</span>
+              </div>
+            </motion.div>
+          </TiltCard>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2 liquid-glass rounded-2xl p-6 overflow-hidden">
+        <FadeInCard className="lg:col-span-2 liquid-glass rounded-2xl p-6 overflow-hidden" delay={0.1}>
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-lg font-bold text-heading">数据趋势</h3>
             <div className="flex gap-3">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#C4B5FD' }} />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#ec4899' }} />
                 <span className="text-xs text-muted">新用户数</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#93C5FD' }} />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#8b5cf6' }} />
                 <span className="text-xs text-muted">处理数据</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#86EFAC' }} />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#f59e0b' }} />
                 <span className="text-xs text-muted">得出结果</span>
               </div>
             </div>
@@ -232,7 +317,7 @@ export default function DashboardSubpage() {
             <svg viewBox="0 0 400 200" className="w-full h-full">
               {[0, 25, 50, 75, 100].map((y, i) => (
                 <line key={i} x1="40" y1={200 - (y / 100) * 160} x2="380" y2={200 - (y / 100) * 160} 
-                      stroke="rgba(255,255,255,0.3)" strokeWidth="1" strokeDasharray="4" />
+                      stroke="rgba(255, 255, 255, 0.3)" strokeWidth="1" strokeDasharray="4" />
               ))}
               {chartData.map((d, i) => (
                 <text key={i} x={40 + (i / 9) * 340} y={195} textAnchor="middle" className="text-[10px] fill-slate-400">
@@ -240,21 +325,21 @@ export default function DashboardSubpage() {
                 </text>
               ))}
               
-              <ChartLine data={chartData} keyName="newUsers" color="#C4B5FD" gradientId="gradient1" />
-              <ChartLine data={chartData} keyName="processed" color="#93C5FD" gradientId="gradient2" />
-              <ChartLine data={chartData} keyName="results" color="#86EFAC" gradientId="gradient3" />
+              <ChartLine data={chartData} keyName="newUsers" color="#ec4899" gradientId="gradient1" animationId={chartAnimationKey} />
+              <ChartLine data={chartData} keyName="processed" color="#8b5cf6" gradientId="gradient2" animationId={chartAnimationKey} />
+              <ChartLine data={chartData} keyName="results" color="#f59e0b" gradientId="gradient3" animationId={chartAnimationKey} />
               
               <defs>
                 <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#C4B5FD" />
+                  <stop offset="0%" stopColor="#ec4899" />
                   <stop offset="100%" stopColor="transparent" />
                 </linearGradient>
                 <linearGradient id="gradient2" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#93C5FD" />
+                  <stop offset="0%" stopColor="#8b5cf6" />
                   <stop offset="100%" stopColor="transparent" />
                 </linearGradient>
                 <linearGradient id="gradient3" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#86EFAC" />
+                  <stop offset="0%" stopColor="#f59e0b" />
                   <stop offset="100%" stopColor="transparent" />
                 </linearGradient>
               </defs>
@@ -272,27 +357,27 @@ export default function DashboardSubpage() {
                 <div className="font-bold text-heading mb-2">{tooltip.month}</div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#C4B5FD' }} />
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#ec4899' }} />
                     <span className="text-body">新用户数: <span className="font-medium">{tooltip.data.newUsers}</span></span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#93C5FD' }} />
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#8b5cf6' }} />
                     <span className="text-body">处理数据: <span className="font-medium">{tooltip.data.processed}</span></span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#86EFAC' }} />
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#f59e0b' }} />
                     <span className="text-body">得出结果: <span className="font-medium">{tooltip.data.results}</span></span>
                   </div>
                 </div>
               </div>
             )}
           </div>
-        </div>
+        </FadeInCard>
 
-        <div className="liquid-glass rounded-2xl p-6 overflow-hidden flex flex-col">
+        <FadeInCard className="liquid-glass rounded-2xl p-6 overflow-hidden flex flex-col" delay={0.2}>
           <h3 className="text-lg font-bold text-heading mb-4">数据占比</h3>
           <div className="flex-1 flex items-center justify-center">
-            <svg viewBox="0 0 100 100" className="w-32 h-32 md:w-40 md:h-40">
+            <svg viewBox="0 0 100 100" className="w-40 h-40 md:w-48 md:h-48">
               {calculatePiePaths().map((item, i) => {
                 const isSelected = selectedPieIndex === i;
                 const centerRad = (item.centerAngle * Math.PI) / 180;
@@ -304,31 +389,30 @@ export default function DashboardSubpage() {
                     key={i}
                     d={item.path}
                     fill={item.color}
-                    opacity={isSelected ? 1 : 0.8}
                     className="cursor-pointer"
-                    initial={{ opacity: 0.8 }}
+                    initial={{ opacity: 0.8, scale: 1 }}
                     animate={{ 
-                      transform: isSelected ? `translate(${offsetX}px, ${offsetY}px)` : 'translate(0, 0)',
+                      x: isSelected ? offsetX : 0,
+                      y: isSelected ? offsetY : 0,
+                      scale: isSelected ? 1.05 : 1,
                       opacity: isSelected ? 1 : 0.8
                     }}
                     transition={{ 
                       type: 'spring', 
-                      stiffness: 300, 
-                      damping: 25,
-                      duration: 0.3
+                      stiffness: 260, 
+                      damping: 20,
+                      mass: 0.8
                     }}
                     onClick={() => setSelectedPieIndex(isSelected ? null : i)}
                     onMouseEnter={() => !selectedPieIndex && setSelectedPieIndex(i)}
                     onMouseLeave={() => selectedPieIndex === i && setSelectedPieIndex(null)}
                     style={{
-                      filter: isSelected ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' : 'none'
+                      filter: isSelected ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.25))' : 'drop-shadow(0 1px 2px rgba(0,0,0,0.15))',
+                      transformOrigin: '50px 50px'
                     }}
                   />
                 );
               })}
-              <circle cx="50" cy="50" r="20" fill="rgba(255,255,255,0.8)" />
-              <text x="50" y="48" textAnchor="middle" className="text-[8px] fill-slate-600 font-bold">100%</text>
-              <text x="50" y="56" textAnchor="middle" className="text-[6px] fill-slate-400">总计</text>
             </svg>
           </div>
           <div className="space-y-2 mt-3">
@@ -340,11 +424,11 @@ export default function DashboardSubpage() {
               </div>
             ))}
           </div>
-        </div>
+        </FadeInCard>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="lg:col-span-2 liquid-glass rounded-2xl p-6 overflow-hidden flex flex-col">
+        <FadeInCard className="lg:col-span-2 liquid-glass rounded-2xl p-6 overflow-hidden flex flex-col" delay={0.3}>
           <h3 className="text-lg font-bold text-heading mb-4">销售数据</h3>
           <div className="flex-1 overflow-auto">
             <div className="grid grid-cols-4 gap-4 mb-3 pb-3 border-b border-white/20">
@@ -355,20 +439,25 @@ export default function DashboardSubpage() {
             </div>
             <div className="space-y-2">
               {tableData.map((item) => (
-                <div key={item.id} className="grid grid-cols-4 gap-4 p-3 rounded-xl bg-white/20 hover:bg-white/30 transition-colors cursor-pointer">
+                <motion.div
+                  key={item.id}
+                  whileHover={{ x: 4, backgroundColor: 'rgba(255, 255, 255, 0.3)' }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  className="grid grid-cols-4 gap-4 p-3 rounded-xl bg-white/20 cursor-pointer"
+                >
                   <div className="text-sm font-medium text-heading">{item.name}</div>
                   <div className="text-sm text-body">{item.category}</div>
                   <div className="text-sm font-mono text-heading">{item.sales}</div>
-                  <div className={`text-sm ${item.growth.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
+                  <div className={`text-sm`} style={{ color: item.growth.startsWith('+') ? '#84CC16' : '#F48EBE' }}>
                     {item.growth}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
-        </div>
+        </FadeInCard>
 
-        <div className="liquid-glass rounded-2xl p-6 overflow-hidden flex flex-col">
+        <FadeInCard className="liquid-glass rounded-2xl p-6 overflow-hidden flex flex-col" delay={0.4}>
           <h3 className="text-lg font-bold text-heading mb-4">代办清单</h3>
           <button 
             onClick={() => setShowAddModal(true)}
@@ -379,12 +468,34 @@ export default function DashboardSubpage() {
           <div className="flex-1 space-y-3 overflow-auto">
             {todos.map((todo) => (
               <div key={todo.id} className={`flex items-center gap-3 p-3 rounded-xl ${todo.completed ? 'bg-green-500/10' : 'bg-white/20'}`}>
-                <input
-                  type="checkbox"
-                  checked={todo.completed}
-                  onChange={() => toggleTodo(todo.id)}
-                  className="w-4 h-4 rounded border-white/30 bg-white/20 text-pink-500 focus:ring-pink-500/50 cursor-pointer"
-                />
+                <motion.div
+                  whileTap={{ scale: 0.85 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                >
+                  <div
+                    onClick={() => toggleTodo(todo.id)}
+                    className={`w-4 h-4 rounded border-2 flex items-center justify-center cursor-pointer transition-all ${
+                      todo.completed 
+                        ? 'bg-pink-500 border-pink-500' 
+                        : 'border-white/30 bg-white/20 hover:border-white/50'
+                    }`}
+                  >
+                    {todo.completed && (
+                      <motion.svg 
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                        className="w-3 h-3 text-white" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="3"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </motion.svg>
+                    )}
+                  </div>
+                </motion.div>
                 <div className="flex-1 min-w-0">
                   <div className={`text-sm ${todo.completed ? 'line-through text-muted' : 'text-heading'}`}>
                     {todo.text}
@@ -420,16 +531,17 @@ export default function DashboardSubpage() {
               </div>
             ))}
           </div>
-        </div>
+        </FadeInCard>
+      </div>
 
-        <AnimatePresence>
+      <AnimatePresence>
           {showAddModal && (
             <motion.div 
-              className="fixed inset-0 modal-overlay z-50 flex items-center justify-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-50 flex items-center justify-center"
+              initial={{ backgroundColor: 'rgba(0, 0, 0, 0)', backdropFilter: 'blur(0px)' }}
+              animate={{ backgroundColor: 'rgba(0, 0, 0, 0.25)', backdropFilter: 'blur(12px)' }}
+              exit={{ backgroundColor: 'rgba(0, 0, 0, 0)', backdropFilter: 'blur(0px)' }}
+              transition={{ duration: 0.3 }}
             >
               <motion.div 
                 className="modal-panel p-6 w-full max-w-sm"
@@ -484,11 +596,11 @@ export default function DashboardSubpage() {
         <AnimatePresence>
           {showEditModal && (
             <motion.div 
-              className="fixed inset-0 modal-overlay z-50 flex items-center justify-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-50 flex items-center justify-center"
+              initial={{ backgroundColor: 'rgba(0, 0, 0, 0)', backdropFilter: 'blur(0px)' }}
+              animate={{ backgroundColor: 'rgba(0, 0, 0, 0.25)', backdropFilter: 'blur(12px)' }}
+              exit={{ backgroundColor: 'rgba(0, 0, 0, 0)', backdropFilter: 'blur(0px)' }}
+              transition={{ duration: 0.3 }}
             >
               <motion.div 
                 className="modal-panel p-6 w-full max-w-sm"
@@ -539,9 +651,8 @@ export default function DashboardSubpage() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
 
-      <div className="liquid-glass rounded-2xl p-6">
+      <FadeInCard className="liquid-glass rounded-2xl p-6" delay={0.5}>
         <h3 className="text-lg font-bold text-heading mb-4">最近活动</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
           {recentActivities.map((activity, i) => (
@@ -554,7 +665,7 @@ export default function DashboardSubpage() {
             </div>
           ))}
         </div>
-      </div>
+      </FadeInCard>
     </div>
   );
 }

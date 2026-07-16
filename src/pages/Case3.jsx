@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Search, Home, Settings, Info } from 'lucide-react';
 import UserAvatar from '../components/ui/UserAvatar';
 import { useBackground } from '../context/BackgroundContext';
@@ -22,6 +22,22 @@ function Case3() {
   const [currentSubpage, setCurrentSubpage] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { getBackgroundStyle, currentScheme } = useBackground();
+  const prevPathRef = useRef(location.pathname);
+
+  useEffect(() => {
+    const prevPath = prevPathRef.current;
+    const currentPath = location.pathname;
+
+    // 从非 social 页面切换到 social 页面时，1.0 秒后自动收起侧边栏
+    if (!prevPath.startsWith('/case3/social') && currentPath.startsWith('/case3/social')) {
+      const timer = setTimeout(() => {
+        setSidebarOpen(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+
+    prevPathRef.current = currentPath;
+  }, [location.pathname]);
 
   useEffect(() => {
     const path = location.pathname.replace('/case3/', '');
@@ -67,7 +83,7 @@ function Case3() {
       case 'video':
         return <VideoSubpage />;
       case 'social':
-        return <SocialSubpage />;
+        return <SocialSubpage sidebarOpen={sidebarOpen} />;
       case 'forum':
         return <ForumSubpage />;
       case 'music':
@@ -77,13 +93,20 @@ function Case3() {
     }
   };
 
+  const { scrollY } = useScroll();
+  const backgroundY = useTransform(scrollY, [0, 1000], [0, -150]);
+  const contentY = useTransform(scrollY, [0, 1000], [0, -50]);
+
   return (
     <div className="w-screen h-screen flex relative overflow-hidden" style={getBackgroundStyle()}>
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <motion.div 
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        style={{ y: backgroundY }}
+      >
         {currentScheme.scheme.gradientOverlay?.map((overlay, index) => (
-          <div
+          <motion.div
             key={index}
-            className="absolute rounded-full"
+            className="absolute rounded-full animate-gradient-drift"
             style={{
               width: overlay.width,
               height: overlay.height,
@@ -93,10 +116,12 @@ function Case3() {
               bottom: overlay.bottom,
               left: overlay.left,
               background: `radial-gradient(circle, ${overlay.color} 0%, transparent 70%)`,
+              animationDelay: `${index * 2}s`,
+              animationDuration: `${15 + index * 3}s`,
             }}
           />
         ))}
-      </div>
+      </motion.div>
 
       <Case3Sidebar 
         sidebarOpen={sidebarOpen} 
@@ -104,7 +129,10 @@ function Case3() {
         currentSubpage={currentSubpage}
       />
 
-      <div className={`flex-1 relative transition-all duration-300 ${sidebarOpen ? 'pl-[304px]' : 'pl-16'}`}>
+      <motion.div 
+        className={`flex-1 relative transition-all duration-300 ${sidebarOpen ? 'pl-[304px]' : 'pl-16'}`}
+        style={{ y: contentY }}
+      >
         <header className={`fixed top-0 right-0 h-16 z-40 px-6 flex items-center justify-end transition-all duration-300 ${sidebarOpen ? 'left-[304px]' : 'left-16'}`}>
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -143,13 +171,14 @@ function Case3() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
+                className="h-full"
               >
                 {renderSubpage()}
               </motion.div>
             </AnimatePresence>
           </div>
         </main>
-      </div>
+      </motion.div>
     </div>
   );
 }

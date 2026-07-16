@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MermaidRenderer from '../../../components/ui/MermaidRenderer';
+import { MarkdownBlock } from '../../../components/ui/MarkdownLine';
 
 export default function MarkdownSubpage() {
   const [isEditing, setIsEditing] = useState(false);
@@ -19,35 +20,9 @@ export default function MarkdownSubpage() {
 
 ## 引用
 
-> War is Peace, Freedom is Slavery, Ignorance is Strength
+> Under the spreading chestnut tree. I sold you and you sold me. There lie they, and here lie we. Under the spreading chestnut tree.
 > 
 > —「1984」
-
-## 列表
-
-### 无序列表
-
-- 项目一
-  - 子项目 A
-  - 子项目 B
-- 项目二
-- 项目三
-
-### 有序列表
-
-1. 第一步：安装依赖
-2. 第二步：配置环境
-3. 第三步：启动项目
-
-## 强调
-
-这是 **粗体** 文本，这是 *斜体* 文本，这是 ~~删除线~~ 文本。
-
-\`这是内联代码\`
-
-## 链接
-
-[访问 GitHub](https://github.com/micromimo/AuroraquaUI)
 
 ## 代码示例
 
@@ -63,6 +38,32 @@ function createCard(title, content) {
   };
 }
 \`\`\`
+
+## 列表
+
+### 有序列表
+
+1. 第一步：安装依赖
+2. 第二步：配置环境
+3. 第三步：启动项目
+
+### 无序列表
+
+- 项目一
+  - 子项目 A
+  - 子项目 B
+- 项目二
+- 项目三
+
+## 强调
+
+这是 **粗体** 文本，这是 *斜体* 文本，这是 ~~删除线~~ 文本。
+
+\`这是内联代码\`
+
+## 链接
+
+[访问 GitHub](https://github.com/micromimo/AuroraquaUI)
 
 ## 任务列表
 
@@ -131,6 +132,7 @@ erDiagram
     let i = 0;
     let keyCounter = 0;
     let inlineKeyCounter = 0;
+    let lineIndex = 0;
 
     const renderInline = (text) => {
       let result = [];
@@ -330,7 +332,7 @@ erDiagram
             i++;
           }
         }
-        elements.push(<table key={`table-${keyCounter++}`} className="w-full rounded-xl overflow-hidden liquid-glass my-4">{tableRows}</table>);
+        elements.push(<table key={`table-${keyCounter++}`} className="w-full rounded-xl overflow-hidden liquid-glass my-4"><tbody>{tableRows}</tbody></table>);
         continue;
       }
 
@@ -340,12 +342,17 @@ erDiagram
       }
 
       if (line.trim()) {
-        elements.push(<p key={`p-${keyCounter++}`} className="text-sm text-body my-3 leading-relaxed">{renderInline(line)}</p>);
+        elements.push(<MarkdownBlock key={`p-${keyCounter++}`} index={lineIndex++}><p className="text-sm text-body my-3 leading-relaxed">{renderInline(line)}</p></MarkdownBlock>);
       }
       i++;
     }
 
-    return elements;
+    return elements.map((el, idx) => {
+      if (el && el.type && el.type.displayName === 'MarkdownBlock') {
+        return el;
+      }
+      return <MarkdownBlock key={idx} index={idx}>{el}</MarkdownBlock>;
+    });
   };
 
   return (

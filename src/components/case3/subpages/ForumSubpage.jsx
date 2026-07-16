@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { forumCategories, defaultPosts, defaultNewPost } from '../../../data/case3/forum';
+import AnimatedNumber from '../../ui/AnimatedNumber';
+import { StaggerItem } from '../../ui/animations';
 
 export default function ForumSubpage() {
   const [selectedCategory, setSelectedCategory] = useState('全部');
@@ -157,9 +159,11 @@ export default function ForumSubpage() {
 
       <div className="flex-1 liquid-glass rounded-2xl p-6 overflow-auto">
         <div className="space-y-4">
-          {filteredPosts.map((post) => (
-            <div 
-              key={post.id} 
+          {filteredPosts.map((post, index) => (
+            <StaggerItem
+              key={post.id}
+              index={index}
+              direction="up"
               className="rounded-xl bg-white/20 transition-all duration-300"
             >
               <div 
@@ -186,8 +190,8 @@ export default function ForumSubpage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-medium text-body">{post.replies} 回复</div>
-                  <div className="text-xs text-muted">{post.views} 浏览</div>
+                  <div className="text-sm font-medium text-body"><AnimatedNumber value={post.replies}>{post.replies}</AnimatedNumber> 回复</div>
+                  <div className="text-xs text-muted"><AnimatedNumber value={post.views}>{post.views}</AnimatedNumber> 浏览</div>
                 </div>
               </div>
 
@@ -204,7 +208,7 @@ export default function ForumSubpage() {
                         <svg className={`w-4 h-4 ${post.isLiked ? 'fill-current' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                         </svg>
-                        <span>{post.likes}</span>
+                        <AnimatedNumber value={post.likes}>{post.likes}</AnimatedNumber>
                       </button>
                       <button 
                         onClick={(e) => { e.stopPropagation(); handleReply(post.id); }}
@@ -273,8 +277,8 @@ export default function ForumSubpage() {
                   </div>
                 </div>
               )}
-            </div>
-          ))}
+              </StaggerItem>
+            ))}
         </div>
       </div>
 

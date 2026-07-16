@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ChevronRight, Bell, Lock, Globe, Palette, Volume2, Shield, HelpCircle, LogOut, User, Mail, MapPin, Link, ChevronLeft, MessageSquare } from 'lucide-react';
 import Switch from '../ui/Switch';
+import { socialSettingsValues } from '../../data/case3/social';
+import { FadeInCard } from '../ui/animations';
 
 function SocialSettingsPage() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -12,9 +14,9 @@ function SocialSettingsPage() {
       title: '账户',
       items: [
         { id: 'profile', label: '编辑个人资料', icon: User, arrow: true },
-        { id: 'email', label: '电子邮箱', icon: Mail, value: 'micromimo@proton.me', arrow: true },
-        { id: 'location', label: '位置', icon: MapPin, value: '🇮🇸 · Reykjavíka', arrow: true },
-        { id: 'link', label: '个人链接', icon: Link, value: '未设置', arrow: true },
+        { id: 'email', label: '电子邮箱', icon: Mail, value: socialSettingsValues.email, arrow: true },
+        { id: 'location', label: '位置', icon: MapPin, value: socialSettingsValues.location, arrow: true },
+        { id: 'link', label: '个人链接', icon: Link, value: socialSettingsValues.link, arrow: true },
       ],
     },
     {
@@ -30,7 +32,7 @@ function SocialSettingsPage() {
       title: '偏好设置',
       items: [
         { id: 'sound', label: '声音', icon: Volume2, toggle: true, value: soundEnabled, onChange: setSoundEnabled },
-        { id: 'theme', label: '主题', icon: Palette, value: '浅色模式', arrow: true },
+        { id: 'theme', label: '主题', icon: Palette, value: socialSettingsValues.theme, arrow: true },
       ],
     },
     {
@@ -58,7 +60,7 @@ function SocialSettingsPage() {
         <div className="max-w-3xl mx-auto space-y-6">
           {settingsGroups.flatMap((group, index) => {
             const groupElement = (
-              <div key={group.title} className="liquid-glass rounded-2xl overflow-hidden">
+              <FadeInCard key={group.title} className="liquid-glass rounded-2xl overflow-hidden" delay={index * 0.1}>
                 <div className="px-5 py-3 bg-white/10 border-b border-white/10">
                   <h4 className="text-sm font-bold text-heading">{group.title}</h4>
                 </div>
@@ -92,17 +94,17 @@ function SocialSettingsPage() {
                     );
                   })}
                 </div>
-              </div>
+              </FadeInCard>
             );
             if (index === 0) {
               return [
                 groupElement,
-                <button key="logout" className="w-full liquid-glass rounded-2xl p-4 text-red-500 hover:text-red-600 hover:bg-red-500/10 transition-colors flex items-center gap-4">
+                <FadeInCard key="logout" className="w-full liquid-glass rounded-2xl p-4 text-red-500 hover:text-red-600 hover:bg-red-500/10 transition-colors flex items-center gap-4" delay={0.4}>
                   <div className="w-9 h-9 rounded-xl bg-red-500/10 flex items-center justify-center">
                     <LogOut className="w-4 h-4" />
                   </div>
                   <span className="text-sm font-medium">登出</span>
-                </button>,
+                </FadeInCard>,
               ];
             }
             return [groupElement];

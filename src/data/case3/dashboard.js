@@ -14,9 +14,9 @@ export const recentActivities = [
 ];
 
 export const pieData = [
-  { label: '新用户数', value: 35, color: '#C4B5FD' },
-  { label: '新增处理数据条目', value: 45, color: '#93C5FD' },
-  { label: '得出结果数', value: 20, color: '#86EFAC' },
+  { label: '新用户数', value: 35, color: '#ec4899' },
+  { label: '新增处理数据条目', value: 45, color: '#8b5cf6' },
+  { label: '得出结果数', value: 20, color: '#f59e0b' },
 ];
 
 export const tableData = [

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ImageCanvas from '../components/case2/ImageCanvas';
 import Case2Sidebar from '../components/case2/Case2Sidebar';
 import { DEFAULT_PROCESSING_CONFIG } from '../components/case2/ControlPanel';
@@ -153,7 +154,7 @@ export default function Case2() {
   }, [isFinished, history]);
 
   return (
-    <div className="w-screen h-screen p-4 pb-0 flex flex-col text-body select-none gap-3">
+    <div className="w-screen h-screen p-4 pb-0 flex flex-col text-slate-700 select-none gap-3">
       <div className="flex-1 flex gap-5 min-h-0">
         <Case2Sidebar
           modelStatus={modelStatus}
@@ -181,7 +182,7 @@ export default function Case2() {
           pipelineStages={[]}
         />
 
-        <main className="flex-1 min-w-0 min-h-0 flex flex-col">
+        <main className="flex-1 min-w-0 min-h-0 flex flex-col relative">
           <ImageCanvas
             imagePath={imagePath}
             bbox={bbox}
@@ -190,10 +191,17 @@ export default function Case2() {
             isFinished={isFinished}
             showImage={!isFinished}
           />
+          <Link 
+            to="/init" 
+            className="bottom-2 right-2 glass-button glass-button-no-scale liquid-glass-glow hover:text-pink-700 font-semibold"
+            style={{ position: 'absolute', width: 'fit-content' }}
+          >
+            <span className="relative z-10">init</span>
+          </Link>
         </main>
       </div>
 
-      <footer className="h-6 flex items-center justify-center text-xs text-muted pb-1">
+      <footer className="h-6 flex items-center justify-center text-xs text-slate-500 pb-1">
         Powered by <span className="neon-text-pink font-semibold mx-1">React</span> & <span className="neon-text-purple font-semibold mx-1">TailwindCSS</span>
       </footer>
 

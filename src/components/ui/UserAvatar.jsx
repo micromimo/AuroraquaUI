@@ -33,7 +33,7 @@ export default function UserAvatar() {
         aria-expanded={isOpen}
       >
         <img
-          src="https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:vg4lorilmjn5ztscb5fh7y2n/bafkreiek3mwh7kpqivzsviwnbnw6ewzqgsva4767rx2dbups24s3bf523a"
+          src="/avater.jpg"
           alt="User Avatar"
           className="w-full h-full object-cover"
         />
@@ -58,7 +58,7 @@ export default function UserAvatar() {
               <div className="flex items-center gap-3 mb-4 pb-4 border-b border-white/20">
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/60">
                   <img
-                    src="https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:vg4lorilmjn5ztscb5fh7y2n/bafkreiek3mwh7kpqivzsviwnbnw6ewzqgsva4767rx2dbups24s3bf523a"
+                    src="/avater.jpg"
                     alt="User Avatar"
                     className="w-full h-full object-cover"
                   />
