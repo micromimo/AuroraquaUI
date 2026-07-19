@@ -1,3 +1,5 @@
+<img width="128" height="128" alt="tauri-icon" src="https://github.com/user-attachments/assets/e6013e9f-3c84-4160-b896-3349c9a2fff3" />
+
 # Aurorαqua🇮🇸🧊
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
