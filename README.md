@@ -1,16 +1,16 @@
-# Aurorάqua🇮🇸🧊
+# Aurorαqua🇮🇸🧊
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 [![React](https://img.shields.io/badge/React-18+-61dafb.svg)](https://reactjs.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0+-38bdf8.svg)](https://tailwindcss.com/)
 
-「Aurorάqua」 a web UI template inspired by Apple LiquidGlass Design and Iceland(Ísland) Aurora, featuring a glassmorphism design and soft aurora gradients. By leveraging component-based architecture, reusability, responsive layouts, and single-page routing, you can use this solution to rapidly build custom interfaces. Built with React & Tailwind. Mozilla Public License 2.0, friendly for commercial use.<br />
+「Aurorαqua」 a web UI template inspired by Apple LiquidGlass Design and Iceland(Ísland) Aurora, featuring a glassmorphism design and soft aurora gradients. By leveraging component-based architecture, reusability, responsive layouts, and single-page routing, you can use this solution to rapidly build custom interfaces. Built with React & Tailwind. Mozilla Public License 2.0, friendly for commercial use.<br />
 For Windows Users, please Install the Monaco and PingFang-SC fonts to attain the suspected experience.<br />
 ⚠️This serves only to showcase my personal UI preferences; most features have not been developed yet, and remains far from complete currently.<br />
 Tauri app versions for macOS and Windows are provided in the release.<br />
 However, it is recommended to run `npm install` and `npm run dev` in the terminal and access the application via a browser (tested in Firefox).
 
-「Aurorάqua」是受 Apple LiquidGlass 設計風格和冰島極光啟發的 Web UI 模板，採用玻璃擬態設計與柔和的極光漸變效果。遵循元件化、可複用性、響應式佈局、單頁路由，助您快速建立自訂介面。基於 React 和 Tailwind 構建。採用 Mozilla Public License 2.0 協議，支援商業用途。<br />
+「Aurorαqua」是受 Apple LiquidGlass 設計風格和冰島極光啟發的 Web UI 模板，採用玻璃擬態設計與柔和的極光漸變效果。遵循元件化、可複用性、響應式佈局、單頁路由，助您快速建立自訂介面。基於 React 和 Tailwind 構建。採用 Mozilla Public License 2.0 協議，支援商業用途。<br />
 對於Windows用戶，由於字體並非系統預先安裝，建議安裝Monaco字體和PingFang SC字體以獲得預期體驗。<br />
 ⚠️目前僅供個人UI喜好展示，大部分功能仍不完善。<br />
 Release中提供了MacOS和Windows版本的Tauri App。<br />
@@ -20,13 +20,19 @@ Release中提供了MacOS和Windows版本的Tauri App。<br />
 
 # Components Demos(in /case3):
 MeTube(Video Streaming Website, imitate Youtube Layout)
-<img width="2772" height="1740" alt="MeTubePage" src="https://github.com/user-attachments/assets/b0fff1b1-b8f5-4be9-834b-b7c2d6812ef1" />
+<img width="2772" height="1740" alt="MeTube-Demo" src="https://github.com/user-attachments/assets/fca21918-2a8b-49f2-a0e4-57836eb5de37" />
+Messenger(imitate Discord)
+<img width="2594" height="1574" alt="Chat-Demo" src="https://github.com/user-attachments/assets/aa770ee9-2c0d-46a6-8758-9026e793af72" />
 Social Media(imitate BlueSky(https://github.com/bluesky-social/social-app) Layout)
-<img width="2168" height="1706" alt="PrysmPage" src="https://github.com/user-attachments/assets/37d257b7-dcd8-4dce-800f-2eeabd22a008" />
+<img width="2772" height="1740" alt="Social-Demo" src="https://github.com/user-attachments/assets/f225ffbd-45fc-4106-9efc-6ba2c6005003" />
 <img width="2170" height="1600" alt="PrysmProfile" src="https://github.com/user-attachments/assets/9bf4bd18-102c-46c8-9864-b5c63f2cfbd0" />
 <img width="2776" height="1740" alt="PrysmSettings" src="https://github.com/user-attachments/assets/7f30c42b-fae0-4bfd-96cf-519cbe1fba4c" />
+Music
+<img width="2772" height="1740" alt="Music-Demo" src="https://github.com/user-attachments/assets/dd51d783-edc5-4061-8a52-63538a5c9cad" />
+
 Dashboard
-<img width="2776" height="1740" alt="Dashboard1" src="https://github.com/user-attachments/assets/3d2c0432-a13a-4efe-a695-4d6b0cf491f8" />
+<img width="2772" height="1740" alt="Dashboard-Demo" src="https://github.com/user-attachments/assets/66cec11e-59b1-4998-bf67-2c21e36cda77" />
+
 
 Video Show:
 
@@ -35,17 +41,21 @@ https://github.com/user-attachments/assets/2552c626-2da6-4cd7-a491-7ae48a026ffd
 https://github.com/user-attachments/assets/24b60935-ac95-42ff-ac40-a1ff3c75f172
 
 Markdown Viewer & Editor
-<img width="2776" height="1740" alt="Markdown" src="https://github.com/user-attachments/assets/6bbe7102-fa60-49c4-b15c-faaac659450a" />
-Management Page
-<img width="2776" height="1740" alt="Management" src="https://github.com/user-attachments/assets/a118cefd-4027-43a0-9830-500848d5bf10" />
+<img width="2772" height="1740" alt="Markdown-Demo" src="https://github.com/user-attachments/assets/370f889f-69af-4d35-95c4-a68357c5b60c" />
 Pop-Out Menu
 <img width="2776" height="1740" alt="Menu" src="https://github.com/user-attachments/assets/f016b90d-dc89-4c0f-9f4e-9e928509ebac" />
 Mermaid Diagrams Viewer & Editor
-<img width="2776" height="1740" alt="Mermaid" src="https://github.com/user-attachments/assets/ed953203-5476-4aa8-b243-9be48aaa2b9e" />
-Chat 
-<img width="2776" height="1740" alt="ChatShow" src="https://github.com/user-attachments/assets/02fecbba-ae89-4ae1-9f7c-cb1ae09120bc" />
-Music Player
-<img width="2774" height="1740" alt="MusicPage" src="https://github.com/user-attachments/assets/6ef785d3-48f6-4ce2-acb8-89ac855bb80f" />
+<img width="2772" height="1740" alt="Mermaid-Demo" src="https://github.com/user-attachments/assets/e5177548-6d2f-4a1c-988e-98ae8b363ef0" />
+Lucide Exposé
+<img width="2772" height="1740" alt="Expose-Demo" src="https://github.com/user-attachments/assets/9615403d-accf-424b-9080-335e3e0f49b5" />
+Cyber Badge Inspect
+<img width="2772" height="1740" alt="Badge-Demo" src="https://github.com/user-attachments/assets/2953fcf4-e14e-4cb0-a6d1-61050f70956a" />
+PRTS(Arknights Info Page)
+<img width="2772" height="1740" alt="PRTS-Demo" src="https://github.com/user-attachments/assets/087a4380-2142-46e7-a353-1f68c0b3374b" />
+MacOS Simulation
+<img width="2772" height="1740" alt="MacOS-Demo" src="https://github.com/user-attachments/assets/93e38b3b-265e-4e97-9ad0-cf0152f5d9f4" />
+Management Page
+<img width="2776" height="1740" alt="Management" src="https://github.com/user-attachments/assets/a118cefd-4027-43a0-9830-500848d5bf10" />
 
 
 # Example1(/case1):
